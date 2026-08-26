@@ -40,14 +40,69 @@ I don't recommend rearranging your pane layout at this time.
 
 Try running some code
 
+### Load Library
+
+```{r}
+library(ggplot2)
+```
+
+### Some scripting
+
 ```{r}
 
+quiz1 <- 88
+quiz2 <- 94
+quiz3 <- 79
+# assignment operator to assign values using left facing arrow, are now variables and named values
+
+quiz1
+# gives quiz1 value 
+
+# averaging
+(quiz1 + quiz2 +quiz3) / 3
+
+# mean
+#mean(quiz1 + quiz2 + quiz 3) #not correct, just adds everything up
+#mean(quiz1, quiz2, quiz 3) #also wrong, only returns the first average
+mean(c(quiz1, quiz2, quiz3)) #correct
+
+list <-c(quiz1, quiz2, quiz3)
+
+quiz3 <-99
+
+average <- mean(list)
+average
+round(average, 2)
 
 ```
+
+```{r}
+###List of More Scores
+
+scores <- c(88, 94, 79, 91, 85)
+scores
+#c for combine
+
+mean(scores)
+min(scores)
+max(scores)
+length(scores)
+
+summary(scores)
+
+students <- c("a","b", "c", "d", "e")
+students
+
+#bar plot
+barplot(scores, names.arg = students)
+```
+
+\
 
 ## Introducing `ggplot2`
 
 ```{r}
+
 
 ```
 
