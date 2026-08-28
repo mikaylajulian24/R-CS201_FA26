@@ -95,14 +95,70 @@ students
 
 #bar plot
 barplot(scores, names.arg = students)
+
+barplot(scores, names.arg = students, ylim = c(0, 100), main = "TITLE",
+xlab = "pupils", y = "what they got")
+#c can catonate, make a list
 ```
 
 \
 
 ## Introducing `ggplot2`
 
+#### Make a dataframe
+
 ```{r}
 
+grades_df <- data.frame(student = students, score = scores)
+grades_df
+
+summary(grades_df) # of rows
+nrow(grades_df) # of cols
+ncol(grades_df) # of dimension
+dim(grades_df)
+
+
+
+```
+
+#### Try ggplot
+
+```{r}
+ggplot(data = grades_df, aes(x = student, y = score)) # gives a blank canvas graph 
+
+ggplot(data = grades_df, aes(x = reorder( student, -score), y = score, group = 1)) + 
+  geom_col(fill = "steelblue") + 
+  geom_point() +
+  geom_line() +
+  theme_minimal() + 
+  labs(title = "BEST GRAPH EVER",
+        subtitle = "some quiz scores",
+        x = "da students",
+        y = "what they scored on their quiz")
+```
+
+#### Mutate the dataframe
+
+```{r}
+#adding a variable tidyverse way
+library(tidyverse)
+
+#command shift m for this character the pipe operator
+grades_df <- grades_df %>% 
+  mutate(study_hours = c(2, 5, 1, 4, 3))
+  
+```
+
+#### Make a scatterplot
+
+```{r}
+ggplot(data = grades_df, aes(x = study_hours, y = score)) + 
+  geom_point(color = "purple") +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_line (color = "pink")
+
+
+# cannot use fill, use color instead, don't use reorder
 
 ```
 
@@ -111,7 +167,15 @@ barplot(scores, names.arg = students)
 What result do you expect when you run this expression?
 
 ```{r}
+1 + 1 + 1
+quiz1 + quiz2
+1 + 1 + 1 - 3
+0.1 + 0.1 + 0.1 - 0.3
+options(scipen = 999)
 
+print(0.1, 20)
+print(0.3, 20)
+print(0.5, 20)
 ```
 
 What did you observe?
