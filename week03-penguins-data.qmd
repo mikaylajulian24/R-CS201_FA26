@@ -1,6 +1,7 @@
 ---
 title: "Analyzing Penguins Data"
 author: 
+  - "Mikayla Julian"
   - "Amber Camp"
   - "Connor Flynn"
 date: 9/2/26
