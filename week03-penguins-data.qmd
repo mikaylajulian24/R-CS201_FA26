@@ -313,6 +313,14 @@ ggplotly(plotname) #makes it interactive after assigning to plotname
 
 ```{r, message=FALSE, warning=FALSE}
 
+ggplot(data = penguins_data, aes(x = culmen_depth_mm, y = body_mass_g, color = species)) +
+  theme_bw() +
+  geom_point() +
+  scale_color_viridis_d(option = "mako") +
+  labs(title = "Palmer Penguins' Culmen Depth and Body Mass",
+       subtitle = "Species observed",
+       x = "Culmen Depth (mm)",
+       y = "Body Mass (g)")
 
 
 ```
@@ -329,7 +337,16 @@ ggplotly(plotname) #makes it interactive after assigning to plotname
 
 ```{r, message=FALSE}
 
+plot <- ggplot(data = penguins_data, aes(x = culmen_depth_mm, y = body_mass_g, color = species)) +
+  theme_bw() +
+  geom_point() +
+  scale_color_viridis_d(option = "mako") +
+  labs(title = "Palmer Penguins' Culmen Depth and Body Mass",
+       subtitle = "Species observed",
+       x = "Culmen Depth (mm)",
+       y = "Body Mass (g)")
 
+ggplotly(plot) #plotly package
 
 ```
 
