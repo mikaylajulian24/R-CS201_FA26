@@ -1,0 +1,356 @@
+---
+title: "Assignment 3: Wrangling penguins with dplyr"
+subtitle: "STUDENT NAME"
+author: "Amber Camp"
+date: "9/11/26"
+format: html
+editor: visual
+---
+
+![](https://allisonhorst.github.io/palmerpenguins/logo.png){width="10%"} ![](https://allisonhorst.shinyapps.io/dplyr-learnr/_w_85e0dbddadc74d638dede947bd3ea7e0/images/dplyr_hex.png){width="10%"}
+
+Welcome to your first real coding assignment in this class! Consider it an achievement making it to this first milestone :)
+
+`dplyr` is one package in the `tidyverse`. It gives us multiple functions that make it easier to work with data. These include manipulation/transformation functions like selecting specific columns, deciding which rows to keep based on whether or not they match our conditions, and finding summary statistics for different variables and groups. Sometimes we call these steps part of “data wrangling.”
+
+Use this assignment as an opportunity to practice applying `dplyr` for data manipulation/transformation, and also to showcase your mastery. These `dplyr` functions will be a foundation to a lot of future exploration in class.
+
+## Load packages
+
+The usual suspects
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse) # dplyr is contained within tidyverse
+library(janitor)
+```
+
+## Read in your data
+
+These penguins are probably becoming familiar at this point!
+
+```{r, message=FALSE, warning=FALSE}
+penguins <- read_csv("data/penguins_lter.csv") # read in data
+
+penguins <- penguins |> # clean up the names
+  clean_names()
+
+```
+
+# Instructions
+
+Due: Sunday 9/13 11:59 pm ON GITHUB AND CANVAS
+
+Visit Allison Horst's very helpful tutorial on `dplyr` here: <https://allisonhorst.shinyapps.io/dplyr-learnr/>
+
+Your job will be to read through each page in the navigation menu on the left side, learn about the different functions, and practice them. Then, apply what you learned in the code chunks below.
+
+Your first exercise (below) starts with "3. `filter()`." All questions are worth 0.5 points, except #9, which is worth 1 point.
+
+Estimated time commitment: 90 minutes
+
+## 3. `filter()`
+
+Use `filter()` to create a subset from `penguins` that only contains female penguins with a culmen length (bill length) greater than or equal to 39 millimeters, and only those that live on Dream or Torgersen islands.
+
+Don't forget to assign to a new object name. (I'm just going to call mine `filter`)
+
+Hints: You can always check your work using `unique()`. It'll tell you the unique values that exist in a specified column, and will also help you identify the correct spelling
+
+```{r, messages=FALSE}
+unique(penguins$species) # an example of how to use unique()
+
+# filter() create subset of data of rows that satisfy certain condition
+
+# method 1: filter penguins data to only keep rows where entry for species matches ecactly "Chinstrap" (case sensitive)
+    # filter(penguins, species == "Chinstrap" | species == "Gentoo")
+
+#method 2: filter penguins only to include chinstrap and gentoo penguins
+# create subset where species matches "Chinstrap" OR "Gentoo"
+  # "or" operator | between conditions
+  # %in% operator then vector of values to look for match in 
+    # filter(penguins, species %in% c("Chinstrap", "Gentoo"))
+
+# method 1 
+filter(penguins, sex == "female", culmen_length_mm >= 39, island == "Dream" | island == "Torgersen")
+
+# method 3 pipe pperator 
+# %>% "and then" to perform operations in logical sequence 
+# to filter for chinstrap
+  # penguins %>% 
+  #   filter(species == "Chinstrap")
+penguins %>% 
+  filter(sex == "female", culmen_length_mm >= 39, island == "Dream" | island == "Torgersen")
+
+# all 3 give same output of 3 penguins
+
+```
+
+## 4. `select()`
+
+Starting with the `penguins` data, keep all columns except `comments`. You should have 16 total columns/variables in the end.
+
+Assign this to a new object name so that you do not overwrite the original data!
+
+```{r, message=FALSE, warning=FALSE}
+# select() list variables want to keep in new subset, seperate by commas
+# select range using : ex. giraffe to narwhal = giraffe : narwhal
+# select() also to reorder columns
+
+# penguins pipe(then) slect exrething except comments; pipe connects steps
+# ex. select(year, island, species) keeps columns year, island and species
+# ex. select(species:body_mass_g) keeps all columns from val 1 to val 2
+
+names(penguins) #get column name to name range
+
+penguins %>% 
+  select(study_name:delta_13_c_o_oo)
+
+
+```
+
+## 5. `relocate()`
+
+Starting with `penguins`, move the `individual_id` variable to the third column position, following `study_name` and `sample_number`. Use `view()` to see if it worked!
+
+Don't forget to assign to a new object name!
+
+```{r, message=FALSE, warning=FALSE}
+# relocate() moves columns around without messing with rows or groups 
+# use .before .after to move column before or after another (list name or     class)
+# single column in the function moves column to the front
+  # ex. relocate (col_A) moves column to the front 
+  # ex. move year column to front of penguins data
+    # pengions %>% 
+    #   reolcate(year) year now first column 
+# move column after another column
+  # ex. penguins %>% 
+  #       relocate(flipper_length_mm, .after = island) flipper length after                                                        island column
+# ex. move any numeric values to after any factor variables
+  # penguins %>% 
+  #   relocate(where(is.numeric), .after=where(is.factor))
+
+penguins %>% 
+  relocate(individual_id, .after = sample_number)
+
+view(penguins)
+```
+
+## 6. `rename()`
+
+Starting with `penguins`, convert the `island` column to `island_name`. Use `view()` to check it worked!
+
+Don't forget to assign to a new object name.
+
+```{r, message=FALSE, warning=FALSE}
+
+penguins %>% 
+  rename(island_name = island)
+
+view(penguins)
+
+#rename() to change name of one or more columns
+  # ex. penguins %>% rename(new_name = old_name)
+#can also rename multiple columns using rename_with()
+#ex. rename island column to palmer_island
+  # penguins %>% 
+  #   rename(palmer_island = island) put new one first
+#ex. rename year column to study_yr, and body_mass_g to mass
+  # penguins %>% 
+  #   rename(study_yr = year, mass = body_mass_g)
+#convert column names in penguins to upper case with toupper (use w/caution)
+  # penguins %>% 
+  #   rename_with(toupper)
+#convert column names that end with "mm" to upper case (toupper)
+  # penguins %>%
+  #   rename_with(toupper, ends_with("mm"))
+
+```
+
+## 7. `mutate()`
+
+Copy `penguins` to a new object called `mutate` and add a column that displays flipper length as kilometers. Call that new column `flippometers`.
+
+```{r, message=FALSE, warning=FALSE}
+
+# copy penguins into new object called mutate <-
+mutate <- penguins %>% 
+  mutate(flippometers = flipper_length_mm / 1000000)
+
+view(mutate)
+
+# mutate() to add a new column while keeping existing columns
+# general structure:
+  # dataframe %>% 
+  #   mutate(new_column_name = what_it_contains)
+# df %>% 
+  # mutate(C = A + B)
+# or df %>% 
+      # mutate(C = sum(A,B))
+  # df with columns A and B; make new column C of sum of A + B
+#ex. add new column to penguins with body mass (g) to kg
+  # penguins %>% 
+      # mutate(body_mass_kg = body_mass_g / 1000)
+#ex. add new column to penguins with the ratio of bill length and bill depth   # penguins %>% 
+      # mutate(bill_ratio = bill_length_mm / bill_depth_mm)
+#add multiple new columns with single mutate()
+  # ex. add 3 columns to penguins with one mutate()
+  # penguins %>% 
+      # mutate(bill_ratio = bill_length_mm / bill_depth_mm,
+          # body_mass_kg = body_mass_g / 1000,
+          # flipper_length_m = flipper_length_mm / 1000)
+```
+
+## 8. `group_by() |> summarize()`
+
+You've done this a couple times in class already!
+
+Create a new dataframe called `number8`. Take `penguins`, group the data by island and species, then create a summary table containing the mean culmen depth (call this `culmen_depth_mean`) and mean culmen length (call this `culmen_length_mean`) for each group.
+
+Apply `na.rm` as needed.
+
+```{r, message=FALSE, warning=FALSE}
+
+number8 <- penguins %>% 
+  group_by(species, island) %>% 
+  summarize(culmen_depth_mean = mean(culmen_depth_mm, na.rm = TRUE),
+            culmen_length_mean = mean(culmen_length_mm, na.rm = TRUE))
+
+view(number8)
+
+# specify groups within your data with group_by()
+# then use summarize() to calculate something (ex. the mean or other statistic) for each group, & return it in a nice table
+
+# ex. table containing mean of penguin body mass, grouped by penguin species
+  # na.rm = TRUE removes NA/missing values
+  #penguins %>%
+     #group_by(species) %>%
+     #summarize(mass_mean = mean(body_mass_g, na.rm = TRUE))
+
+# ex. containing the mean and standard deviation of penguin body mass, grouped by penguin species
+  # penguins %>%
+      #group_by(species) %>%
+      #summarize(mass_mean = mean(body_mass_g, na.rm = TRUE),
+          #mass_sd = sd(body_mass_g, na.rm = TRUE))
+```
+
+## 9. `across()`
+
+Starting with `penguins`, only keep observations for Biscoe island, group by `species`, then use `across()` to find the maximum value for any numeric variable
+
+```{r, message=FALSE, warning=FALSE}
+
+penguins %>% 
+  filter(island == "Biscoe") %>% 
+  group_by(species) %>% 
+  summarize(across(where(is.numeric), max, na.rm = TRUE))
+    
+
+
+#across() applies same transformation to multiple columns 
+#useful within summarize() to create summary tables and apply functions to multiple columns
+
+#create summary table of mean values for all penguins ending in "mm" by species
+#method 1: use group_by() %>% summarize()
+  # penguins %>%
+      #group_by(species) %>%
+      #summarize(bill_length_mean = mean(bill_length_mm, na.rm = TRUE),
+                #bill_depth_mean = mean(bill_depth_mm, na.rm = TRUE),
+                #flipper_length_mean = mean(flipper_length_mm, na.rm = TRUE         ))
+#method 2: use across() within summarize()
+  # penguins %>% 
+      #group_by(species) %>%
+      #summarize(across(ends_with("mm"), mean, na.rm = TRUE))
+  
+  # ex. contain mean values of all columns from bill depth to body mass, group by species and year
+      # penguins %>% 
+          #group_by(species, island) %>% 
+          #summarize(across(bill_depth_mm:body_mass_g, min, na.rm.= TRUE))
+  #ex.  contain min. values for bill length and body mass, group by species
+      #penguins %>% 
+          #group_by(species) %>% 
+              #summarize(across(c(bill_length_mm, body_mass_g), min, na.rm = TRUE))
+
+```
+
+## 10. `count()`
+
+Starting with `penguins`, create a new object called `count` that filters out all `sex` values other than `MALE` and `FEMALE`. Then, in the same piped function, display the count of all penguins by `island`, `species`, and `sex`.
+
+```{r, message=FALSE, warning=FALSE}
+
+count <- penguins %>% 
+  filter(sex == "MALE" | sex == "FEMALE") %>% 
+  group_by(island, species, sex) %>% 
+  summarize (count = n())
+
+count
+# count wraps multiple ethings into one line of code, help to find counts of observations by group
+  # 1: group_by() %>% summarize() with n() to count obervsations
+  # 2: count() to do the exact same thing 
+      # penguins %>%
+          #count(species)
+  
+      # count by species, year
+          #penguins %>% 
+              #count(species, year)
+```
+
+## 11. `case_when()`
+
+Create a new object called `case_when` from `penguins` and add a new column called `size` that contains:
+
+- "big" when `body_mass_g` is greater than or equal to 4050
+
+- "small" when `body_mass_g` is less than 4050
+
+Use `summary(as.factor(case_when$size))` to check your work
+
+```{r, message=FALSE, warning=FALSE}
+
+
+```
+
+## 12. Final Boss 🐧 (up to 2.5 pts extra credit)
+
+#### OPTIONAL!!
+
+This is meant to [*stretch*]{.underline} you, not [*stress*]{.underline} you!
+
+You’ve made it to the Final Boss 🐧! This challenge is meant to stretch your skills and combine what you’ve learned. Take it one step at a time.
+
+Create a new object called `final_boss` that satisfies all of the following:
+
+1.  Start with the `penguins` dataset.
+
+2.  Filter to keep only *female* penguins with a known `flipper_length_mm` (not `NA`) that are either on Dream or Biscoe island.
+
+3.  Select just these columns: `species`, `island`, `flipper_length_mm`, and `body_mass_g`.
+
+4.  Mutate a new variable called `flipper_rank`:
+
+    - If `flipper_length_mm` is less than 190, assign `"short"`,
+
+    - If `flipper_length_mm` is between 190 and 210, assign `"medium"`,
+
+    - If greater than 210, assign `"long"`.
+
+5.  Group by `species`, `island`, and `flipper_rank`, and summarize the *average body mass* (name this column `avg_mass_g`), rounded to the nearest whole number.
+
+#### Hints:
+
+- Use `case_when()` inside `mutate()` for flipper ranking.
+
+- Use `round()` inside `summarize()` to round your final result.
+
+- Your `final_boss` dataframe should be 8 observations × 4 variables.
+
+- Use comments (`#`) to help you think through each step.
+
+- Use `print(final_boss)` when you're done.
+
+```{r, message=FALSE, warning=FALSE}
+
+
+```
+
+# Push to GitHub AND submit link on Canvas!!
