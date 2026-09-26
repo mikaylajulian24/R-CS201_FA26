@@ -1,0 +1,347 @@
+---
+title: "Assignment 4: Exploratory Data Analysis"
+author: "Mikayla Julian"
+date: "9/25/26`"
+format: html
+editor: visual
+---
+
+## Overview
+
+Due: **Friday 9/25 11:59pm**
+
+In this assignment, you will practice Exploratory Data Analysis (EDA) by making plots from a **Kaggle dataset of your choice**.
+
+You will submit **at least 4 different plot types**, with short written interpretations for each.
+
+Part 1 is worth a total of 1 point, and Part 2 is worth 4 points (1 point for each plot, question, and interpretation).
+
+## Part 1: Get Your Data
+
+1.  Go to [Kaggle Datasets](https://www.kaggle.com/datasets), create an account, and choose a dataset that interests you. Ensure your data has:
+    1.  At least 4 variables
+    2.  At least one categorical and one continuous variable
+    3.  I recommend data that contains at least 50-100 observations
+    4.  Tip: Open the CSV on Kaggle first and skim the columns to check that it meets these requirements
+2.  Download the dataset as a CSV file.
+3.  Place the CSV in your class R project `data` folder.
+4.  Read it into R with `read_csv()`.
+
+Dataset: Can you classify the species from the features of their songs?
+
+```{r, message=FALSE}
+
+library(tidyverse)
+library(janitor)
+library(datasauRus)
+birddata <- read_csv("data/bird_song_data.csv")
+
+```
+
+### Describe your data
+
+Data author: Edoardo Ferrante
+
+Link: <https://www.kaggle.com/datasets/fleanend/birds-songs-numeric-dataset/data?select=train.csv>
+
+Description:
+
+- Birds use calls and songs for many purposes: attracting potential partners to asserting dominance over a territory. dataset is comprised of a test set of 88 species grouped in 61 genera of spectral features extracted from the birds' songs
+
+### Preview your data
+
+Use some of the strategies you've learned in this class or picked up elsewhere to summarize and quickly explore your data.
+
+```{r}
+summary(birddata)
+```
+
+### Summary stats
+
+Before you make plots, you must also:
+
+- Show basic summaries of your dataset, including:
+
+  - `count()` for categorical variables (to see category frequencies)
+
+  - `mean()`, `median()`, `sd()`, `min()`, `max()` for at least one numeric variable
+
+  - Remember to use `na.rm = TRUE` if you have missing values that affect summaries!
+
+```{r}
+
+data("birddata")
+# View(birddata)
+
+###Count & Summarize###
+
+birddata %>% 
+  count(species)
+
+birddata %>% 
+  count(genus)
+# species, genus as categorical value - shows freq. of each bird species
+
+birddata %>%
+  summarise(
+    mean = mean(chromogram_0_0, na.rm = TRUE),
+    median = median(chromogram_0_0, na.rm = TRUE),
+    sd = sd(chromogram_0_0, na.rm = TRUE),
+    min = min(chromogram_0_0, na.rm = TRUE),
+    max = max(chromogram_0_0, na.rm = TRUE)
+  )
+# chromogram_0_0 continous variable summary 
+```
+
+Write 2–3 sentences here: What do the category counts tell you? What does the numeric summary show about spread, center, or outliers?
+
+- count(species): species category count tells count by species; dataset shows 85 different bird species and most species have 20 recordings
+
+- count(genus): genus category count tells count by genus; more varied, some genus have more recordings than others
+
+- The numeric summary of chromogram_0_0 shows mean of 0.292 and median of 0.088 - data is right-skewed (has some higher values that increase mean)
+
+## Part 2: Visualize Your Data
+
+Create **at least 4 plots**, each of a different type. Your plots may share variables, but each one should answer a **different question** about your data. At least one plot must include a variable that isn't in the others.
+
+Each plot should have:
+
+- A title and labeled axes
+
+- A short interpretation (2-3 sentences) underneath
+
+  - Sample interpretation: (boxplot of `price` by `cut` from `diamonds` data): *Ideal diamonds have the lowest median price, which is surprising since Ideal is the best cut. Every cut also has a lot of very expensive outliers. One possible reason for the low Ideal prices is that Ideal diamonds might be smaller on average, which I could check by plotting carat by cut.*
+
+Use the EDA Part 3 notes as your reference. Since this is an EDA assignment, your plots can look plain, but consider adding colors, themes, or interactivity for interpretability and visual appeal if you know how.
+
+### Plot 1
+
+```{r}
+# Bar chart for species frequency
+# ggplot(birddata, aes(x = species)) +
+#   geom_bar() +
+#   labs(
+#     title = "Number of Recordings by Bird Species",
+#     x = "Species",
+#     y = "Count"
+#   ) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+# 
+ggplot(birddata, aes(x = species, y = chromogram_0_0)) +
+  geom_point(alpha = 0.3) +
+  labs(
+    title = "Species' Chromogram_0_0 Relevance & Distribution",
+    x = "Species",
+    y = "Chromogram_0_0"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+# 
+# ggplot(birddata, aes(x = species, y = chromogram_0_0)) +
+#   geom_boxplot() +
+#   labs(
+#     title = "Species' Chromogram_0_0 Relevance & Distribution",
+#     x = "Species",
+#     y = "Chromogram_0_0"
+#   ) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(birddata, aes(x = fct_infreq(genus))) +
+  geom_bar() +
+  coord_flip() +
+  labs(
+    title = "Number of Recordings by Bird Genus",
+    x = "Number of Recordings",
+    y = "Genus"
+  ) +
+  theme(
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 5)
+  )
+
+```
+
+Question this plot answers: How are the bird recordings distributed across genera?
+
+Interpretation: The number of recordings varies across bird genera, with some genera having more observations than others. Ex., Acrocephalus has more recordings than many of the other genera in the dataset. This shows that the dataset is not evenly distributed across genera.
+
+### Plot 2
+
+```{r}
+# insert code here, make into number of chromogram00 recordings by genus
+ggplot(birddata, aes(x = chromogram_0_0)) +
+  geom_histogram(bins = 30) +
+  labs(
+    title = "Distribution of Chromogram 0_0",
+    x = "Chromogram 0_0",
+    y = "Number of Recordings"
+  )
+
+
+# ggplot(birddata, aes(x = genus, y = chromogram_0_0)) +
+#   geom_point() +
+#   labs(
+#     title = "Distribution of Chromogram 0_0 within Birds' Genus'",
+#     x = "Genus",
+#     y = "Chromogram_0_0 Prevalence"
+#   ) +
+#   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Question this plot answers: What is the distribution of `chromogram_0_0` across the bird recordings?
+
+Interpretation: Most of the `chromogram_0_0` values are concentrated toward the lower end of the distribution, and fewer observations have larger values. The distribution is right-skewed, which matches the difference between the mean and median from the summary statistics.
+
+### Plot 3
+
+```{r}
+# insert code here
+ggplot(birddata, aes(x = species, y = spec_centr_0)) +
+  geom_boxplot() +
+  labs(
+    title = "Spectral Centroid (weighted mean of sound frequency) by Bird Species",
+    x = "Species",
+    y = "Spectral Centroid"
+  ) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+
+# spectral centroid: weighted mean of the frequencies present in a sound, representing the "center of mass" of the frequency spectrum
+
+```
+
+Question this plot answers: How does spectral centroid vary among different bird species?
+
+Interpretation: shows that the spectral centroid varies among the different bird species. Some species have higher median spectral centroid values, while others have lower values. There is also variation within individual species, showing that recordings from the same species can have different spectral centroid values.
+
+### Plot 4
+
+```{r}
+# insert code here
+ggplot(birddata, aes(
+  x = chromogram_0_0,
+  y = fct_reorder(species, chromogram_0_0, .fun = median, na.rm = TRUE)
+)) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(
+    title = "Chromogram 0_0 Across Bird Species",
+    x = "Chromogram 0_0",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  x = chromogram_0_1,
+  y = fct_reorder(species, chromogram_0_1, .fun = median, na.rm = TRUE)
+)) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(
+    title = "Chromogram 0_1 Across Bird Species",
+    x = "Chromogram 0_1",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  x = chromogram_0_10,
+  y = fct_reorder(species, chromogram_0_10, .fun = median, na.rm = TRUE)
+)) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(
+    title = "Chromogram 0_10 Across Bird Species",
+    x = "Chromogram 0_10",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  x = chromogram_10_0,
+  y = fct_reorder(species, chromogram_10_0, .fun = median, na.rm = TRUE)
+)) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(
+    title = "Chromogram 10_0 Across Bird Species",
+    x = "Chromogram 10_0",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  x = chromogram_5_10,
+  y = fct_reorder(species, chromogram_5_10, .fun = median, na.rm = TRUE)
+)) +
+  geom_jitter(height = 0.2, alpha = 0.4, size = 1) +
+  labs(
+    title = "Chromogram 5_10 Across Bird Species",
+    x = "Chromogram 5_10",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  y = species
+)) +
+  geom_jitter(aes(x = chromogram_2_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_3_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_4_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_5_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_6_0), height = 0.2, alpha = 0.4) +
+  labs(
+    title = "Chromograms Across Bird Species",
+    x = "Chromogram Value",
+    y = "Species"
+  )
+
+ggplot(birddata, aes(
+  y = species
+)) +
+  geom_jitter(aes(x = chromogram_7_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_8_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_9_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_10_0), height = 0.2, alpha = 0.4) +
+  geom_jitter(aes(x = chromogram_11_0), height = 0.2, alpha = 0.4) +
+  labs(
+    title = "Chromograms Across Bird Species",
+    x = "Chromogram Value",
+    y = "Species"
+  )
+```
+
+Question this plot answers: Do different species tend to have different chromogram values? / Do bird species show different patterns in their chromogram features?
+
+Interpretation: shows that `chromogram_0_0` values vary among bird species. Some species tend to have higher or lower chromogram values than others, although there is also variation within each species. This suggests that chromogram features may help distinguish between some bird species based on their songs.
+
+multiple chromogram values: How do chromogram values differ across different bird species?
+
+Interpretation: shows the distribution of chromogram values across different bird species. The spread of the points shows that some species have higher chromogram values while others have lower values. Species with points farther to the right have higher chromogram values, while species with points farther to the left have lower values. Overall, the graph allows us to compare the chromogram patterns between species and see whether some species have similar or different values
+
+### 
+
+```{r}
+ggplot(birddata, aes(
+  y = species
+)) +
+  geom_jitter(aes(x = "5_0", color = chromogram_5_0), height = 0.2) +
+  geom_jitter(aes(x = "5_1", color = chromogram_5_1), height = 0.2) +
+  geom_jitter(aes(x = "5_2", color = chromogram_5_2), height = 0.2) +
+  geom_jitter(aes(x = "5_3", color = chromogram_5_3), height = 0.2) +
+  geom_jitter(aes(x = "5_4", color = chromogram_5_4), height = 0.2) +
+  geom_jitter(aes(x = "5_5", color = chromogram_5_5), height = 0.2) +
+  geom_jitter(aes(x = "5_6", color = chromogram_5_6), height = 0.2) +
+  geom_jitter(aes(x = "5_7", color = chromogram_5_7), height = 0.2) +
+  geom_jitter(aes(x = "5_8", color = chromogram_5_8), height = 0.2) +
+  geom_jitter(aes(x = "5_9", color = chromogram_5_9), height = 0.2) +
+  geom_jitter(aes(x = "5_10", color = chromogram_5_10), height = 0.2) +
+  geom_jitter(aes(x = "5_11", color = chromogram_5_11), height = 0.2) +
+  geom_jitter(aes(x = "5_12", color = chromogram_5_12), height = 0.2) +
+  labs(
+    title = "Chromogram 5 Across Bird Species",
+    x = "Chromogram",
+    y = "Species",
+    color = "Chromogram Value"
+  )
+```
+
+How do chromogram 5 values vary across different bird species and chromogram positions?
+
+The plot shows that chromogram values vary across bird species and across the 13 chromogram positions from `5_0` to `5_12`. The darker points represent lower chromogram values, while the lighter points represent higher values. Some species have more light-colored points at certain chromogram positions, while others have mostly darker points. This suggests that the chromogram patterns differ between species and that some chromogram positions may have higher or lower values for certain species.
+
+------------------------------------------------------------------------
+
+# Push to GitHub AND submit link on Canvas!!
+
+Assignment is due Friday 9/25 at 11:59 pm.
